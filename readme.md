@@ -1,5 +1,10 @@
 # pyhashcat
 
+## notes
+upon checking out hashcat; you will probably need to edit hashcat/deps/zlib/contrib/minizip/crypt.h<br>
+append "#include <deps/zlib/zconf.h>" to the top of the file<br>
+to test if the build would work just "mkdir build; cmake ..; make"
+
 Python bindings for hashcat
 ------
 Python C API binding to libhashcat, originally written by Rich5. Updated to use the latest Hashcat version, with additional functionality added. 
