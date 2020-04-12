@@ -1,23 +1,26 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-import os
-import sys
 from time import sleep
 from pyhashcat import Hashcat
 
+
 def cracked_callback(sender):
     print(id(sender), "EVENT_CRACKER_HASH_CRACKED")
+
 
 def finished_callback(sender):
     global finished
     finished = True
 
+
 def benchmark_status(sender):
     device_cnt = sender.status_get_device_info_cnt()
+    print(sender)
     print("HashType: ", str(sender.status_get_hash_type()))
 
     for i in range(device_cnt):
-        print("Speed.Dev.#", str(i), ".....: ", str(sender.status_get_speed_sec_dev(i)),"H/s (", str(sender.status_get_exec_msec_dev(i)), "ms)")
+        print("Speed.Dev.#", str(i), ".....: ", str(sender.status_get_speed_sec_dev(i)), "H/s (",
+              str(sender.status_get_exec_msec_dev(i)), "ms)")
 
 
 print("-------------------------------")

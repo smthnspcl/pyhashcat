@@ -2,8 +2,8 @@
 
 import os
 import sys
-from time import sleep
 from pyhashcat import Hashcat
+
 
 def cracked_callback(sender):
 	print("CRACKED-", id(sender), "EVENT_CRACKER_HASH_CRACKED")
@@ -12,8 +12,10 @@ def cracked_callback(sender):
 def finished_callback(sender):
 	print("FIN-", id(sender), "EVENT_CRACKER_FINISHED")
 
+
 def any_callback(sender):
 	print("ANY-", id(sender), sender.status_get_status_string())
+
 
 print("-------------------------------")
 print("---- Simple pyhashcat Test ----")
@@ -26,7 +28,6 @@ print("[!] Hashcat object init with id: ", id(hc))
 print("[!] cb_id cracked: ", hc.event_connect(callback=cracked_callback, signal="EVENT_CRACKER_HASH_CRACKED"))
 print("[!] cb_id finished: ", hc.event_connect(callback=finished_callback, signal="EVENT_CRACKER_FINISHED"))
 print("[!] cb_id any: ", hc.event_connect(callback=any_callback, signal="ANY"))
-
 
 hc.hash = "8743b52063cd84097a65d1633f5c74f5"
 hc.mask = "?l?l?l?l?l?l?l"
@@ -44,16 +45,17 @@ if hc.hashcat_session_execute() >= 0:
 	# hashcat should be running in a background thread
 	# wait for it to finishing cracking
 	i = 0
+	ps = "-"
 	while True:
 		# do something else while cracking
 		i += 1
-		if i%4 == 0:
+		if i % 4 == 0:
 			ps = '-'
-		elif i%4 == 1:
+		elif i % 4 == 1:
 			ps = '\\'
-		elif i%4 == 2:
+		elif i % 4 == 2:
 			ps = '|'
-		elif i%4 == 3:
+		elif i % 4 == 3:
 			ps = '/'
 		sys.stdout.write("%s\r" % ps)
 		sys.stdout.flush()
@@ -66,17 +68,15 @@ if hc.hashcat_session_execute() >= 0:
 			with open(hc.outfile, 'r') as f:
 				cracked = [i.strip() for i in f.readlines()]
 				break
-		except:
+		except Exception as e:
+			print(e)
 			pass
-
 
 	if len(cracked) > 0:
 		for c in cracked:
-			ahash, plain = c.split(hc.separator.decode("utf-8"))
-			print(ahash, " --> ", plain)
+			a_hash, plain = c.split(hc.separator.decode("utf-8"))
+			print(a_hash, " --> ", plain)
 	else:
 		print("No cracked hashes found")
 else:
 	print("STATUS: ", hc.status_get_status_string())
-
-#sleep(5)

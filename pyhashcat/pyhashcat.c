@@ -4,17 +4,16 @@
 // License: MIT
 //
 
-#include <Python.h>
-#include <assert.h>
+#include <python3.7/Python.h>
+#include <python3.7/structmember.h>
+#include <common.h>
+#include <types.h>
+#include <memory.h>
+#include <status.h>
+#include <user_options.h>
 #include <pthread.h>
+#include <hashcat.h>
 
-#include "structmember.h"
-#include "common.h"
-#include "types.h"
-#include "memory.h"
-#include "status.h"
-#include "user_options.h"
-#include "hashcat.h"
 
 #ifndef MAXH
 #define MAXH 100
@@ -34,7 +33,6 @@ Ex: hc.event_connect(callback=cracked_callback, signal=\"EVENT_CRACKER_HASH_CRAC
 /* hashcat object */
 typedef struct
 {
-
   PyObject_HEAD hashcat_ctx_t * hashcat_ctx;
   user_options_t *user_options;
   hashcat_status_t *hashcat_status;
@@ -98,10 +96,10 @@ const char *event_strs[] = {
 "EVENT_MONITOR_PERFORMANCE_HINT",
 "EVENT_MONITOR_NOINPUT_HINT",
 "EVENT_MONITOR_NOINPUT_ABORT",
-"EVENT_OPENCL_SESSION_POST",
-"EVENT_OPENCL_SESSION_PRE",
-"EVENT_OPENCL_DEVICE_INIT_POST",
-"EVENT_OPENCL_DEVICE_INIT_PRE",
+"EVENT_BACKEND_SESSION_POST",
+"EVENT_BACKEND_SESSION_PRE",
+"EVENT_BACKEND_DEVICE_INIT_POST",
+"EVENT_BACKEND_DEVICE_INIT_PRE",
 "EVENT_OUTERLOOP_FINISHED",
 "EVENT_OUTERLOOP_MAINSCREEN",
 "EVENT_OUTERLOOP_STARTING",
@@ -251,10 +249,10 @@ static void event (const u32 id, hashcat_ctx_t * hashcat_ctx, const void *buf, c
     case EVENT_MONITOR_PERFORMANCE_HINT:        size = asprintf(&esignal, "%s", "EVENT_MONITOR_PERFORMANCE_HINT"); break;
     case EVENT_MONITOR_NOINPUT_HINT:            size = asprintf(&esignal, "%s", "EVENT_MONITOR_NOINPUT_HINT"); break;
     case EVENT_MONITOR_NOINPUT_ABORT:           size = asprintf(&esignal, "%s", "EVENT_MONITOR_NOINPUT_ABORT"); break;
-    case EVENT_OPENCL_SESSION_POST:             size = asprintf(&esignal, "%s", "EVENT_OPENCL_SESSION_POST"); break;
-    case EVENT_OPENCL_SESSION_PRE:              size = asprintf(&esignal, "%s", "EVENT_OPENCL_SESSION_PRE"); break;
-    case EVENT_OPENCL_DEVICE_INIT_POST:         size = asprintf(&esignal, "%s", "EVENT_OPENCL_SESSION_PRE"); break;
-    case EVENT_OPENCL_DEVICE_INIT_PRE:          size = asprintf(&esignal, "%s", "EVENT_OPENCL_SESSION_PRE"); break;
+    case EVENT_BACKEND_SESSION_POST:             size = asprintf(&esignal, "%s", "EVENT_OPENCL_SESSION_POST"); break;
+    case EVENT_BACKEND_SESSION_PRE:              size = asprintf(&esignal, "%s", "EVENT_OPENCL_SESSION_PRE"); break;
+    case EVENT_BACKEND_DEVICE_INIT_POST:         size = asprintf(&esignal, "%s", "EVENT_OPENCL_SESSION_PRE"); break;
+    case EVENT_BACKEND_DEVICE_INIT_PRE:          size = asprintf(&esignal, "%s", "EVENT_OPENCL_SESSION_PRE"); break;
     case EVENT_OUTERLOOP_FINISHED:              size = asprintf(&esignal, "%s", "EVENT_OUTERLOOP_FINISHED"); break;
     case EVENT_OUTERLOOP_MAINSCREEN:            size = asprintf(&esignal, "%s", "EVENT_OUTERLOOP_MAINSCREEN"); break;
     case EVENT_OUTERLOOP_STARTING:              size = asprintf(&esignal, "%s", "EVENT_OUTERLOOP_STARTING"); break;
@@ -932,14 +930,14 @@ DETAILS:\n\
 static PyObject *hashcat_status_get_guess_mode (hashcatObject * self, PyObject * noargs)
 {
 
-  int rtn;
+    int rtn;
 
-  rtn = status_get_guess_mode (self->hashcat_ctx);
-  return Py_BuildValue ("i", rtn);
+    rtn = status_get_guess_mode (self->hashcat_ctx);
+    return Py_BuildValue ("i", rtn);
 }
 
 PyDoc_STRVAR(status_get_guess_base__doc__,
-"status_get_guess_base -> str\n\n\
+             "status_get_guess_base -> str\n\n\
 Return base input source.\n\n\
 DETAILS:\n\
 Depending on the mode the input base could be dict1, dict2, or mask.\n\n");
@@ -947,51 +945,51 @@ Depending on the mode the input base could be dict1, dict2, or mask.\n\n");
 static PyObject *hashcat_status_get_guess_base (hashcatObject * self, PyObject * noargs)
 {
 
-  char *rtn;
+    char *rtn;
 
-  rtn = status_get_guess_base (self->hashcat_ctx);
-  return Py_BuildValue ("s", rtn);
+    rtn = status_get_guess_base (self->hashcat_ctx);
+    return Py_BuildValue ("s", rtn);
 }
 
 PyDoc_STRVAR(status_get_guess_base_offset__doc__,
-"status_get_guess_base_offset -> int\n\nReturn base input offset.\n\n");
+             "status_get_guess_base_offset -> int\n\nReturn base input offset.\n\n");
 
 static PyObject *hashcat_status_get_guess_base_offset (hashcatObject * self, PyObject * noargs)
 {
 
-  int rtn;
+    int rtn;
 
-  rtn = status_get_guess_base_offset (self->hashcat_ctx);
-  return Py_BuildValue ("i", rtn);
+    rtn = status_get_guess_base_offset (self->hashcat_ctx);
+    return Py_BuildValue ("i", rtn);
 }
 
 PyDoc_STRVAR(status_get_guess_base_count__doc__,
-"status_get_guess_base_count -> int\n\nReturn base input count.\n\n");
+             "status_get_guess_base_count -> int\n\nReturn base input count.\n\n");
 
 static PyObject *hashcat_status_get_guess_base_count (hashcatObject * self, PyObject * noargs)
 {
 
-  int rtn;
+    int rtn;
 
-  rtn = status_get_guess_base_count (self->hashcat_ctx);
-  return Py_BuildValue ("i", rtn);
+    rtn = status_get_guess_base_count (self->hashcat_ctx);
+    return Py_BuildValue ("i", rtn);
 }
 
 PyDoc_STRVAR(status_get_guess_base_percent__doc__,
-"status_get_guess_base_percent -> double\n\nReturn base input percent.\n\n");
+             "status_get_guess_base_percent -> double\n\nReturn base input percent.\n\n");
 
 static PyObject *hashcat_status_get_guess_base_percent (hashcatObject * self, PyObject * noargs)
 {
 
-  double rtn;
+    double rtn;
 
-  rtn = status_get_guess_base_percent (self->hashcat_ctx);
-  return Py_BuildValue ("d", rtn);
+    rtn = status_get_guess_base_percent (self->hashcat_ctx);
+    return Py_BuildValue ("d", rtn);
 }
 
 
 PyDoc_STRVAR(status_get_guess_mod__doc__,
-"status_get_guess_mod -> str\n\n\
+             "status_get_guess_mod -> str\n\n\
 Return input modification.\n\n\
 DETAILS:\n\
 Depending on the mode the mod could be rules file, dict1, dict2, or mask.\n\n");
@@ -999,73 +997,74 @@ Depending on the mode the mod could be rules file, dict1, dict2, or mask.\n\n");
 static PyObject *hashcat_status_get_guess_mod (hashcatObject * self, PyObject * noargs)
 {
 
-  char *rtn;
+    char *rtn;
 
-  rtn = status_get_guess_mod (self->hashcat_ctx);
-  return Py_BuildValue ("s", rtn);
+    rtn = status_get_guess_mod (self->hashcat_ctx);
+    return Py_BuildValue ("s", rtn);
 }
 
 PyDoc_STRVAR(status_get_guess_mod_offset__doc__,
-"status_get_guess_mod_offset -> int\n\nReturn input modification offset.\n\n");
+             "status_get_guess_mod_offset -> int\n\nReturn input modification offset.\n\n");
 
 static PyObject *hashcat_status_get_guess_mod_offset (hashcatObject * self, PyObject * noargs)
 {
 
-  int rtn;
+    int rtn;
 
-  rtn = status_get_guess_mod_offset (self->hashcat_ctx);
-  return Py_BuildValue ("i", rtn);
+    rtn = status_get_guess_mod_offset (self->hashcat_ctx);
+    return Py_BuildValue ("i", rtn);
 }
 
 PyDoc_STRVAR(status_get_guess_mod_count__doc__,
-"status_get_guess_mod_count -> int\n\nReturn input modification count.\n\n");
+             "status_get_guess_mod_count -> int\n\nReturn input modification count.\n\n");
 
 static PyObject *hashcat_status_get_guess_mod_count (hashcatObject * self, PyObject * noargs)
 {
 
-  int rtn;
+    int rtn;
 
-  rtn = status_get_guess_mod_count (self->hashcat_ctx);
-  return Py_BuildValue ("i", rtn);
+    rtn = status_get_guess_mod_count (self->hashcat_ctx);
+    return Py_BuildValue ("i", rtn);
 }
 
 PyDoc_STRVAR(status_get_guess_mod_percent__doc__,
-"status_get_guess_mod_percent -> double\n\nReturn input modification percent.\n\n");
+             "status_get_guess_mod_percent -> double\n\nReturn input modification percent.\n\n");
 
 static PyObject *hashcat_status_get_guess_mod_percent (hashcatObject * self, PyObject * noargs)
 {
 
-  double rtn;
+    double rtn;
 
-  rtn = status_get_guess_mod_percent (self->hashcat_ctx);
-  return Py_BuildValue ("d", rtn);
+    rtn = status_get_guess_mod_percent (self->hashcat_ctx);
+    return Py_BuildValue ("d", rtn);
 }
 
 PyDoc_STRVAR(status_get_guess_charset__doc__,
-"status_get_guess_charset -> str\n\n\
+             "status_get_guess_charset -> str\n\n\
 Return charset used during session.\n\n");
 
 static PyObject *hashcat_status_get_guess_charset (hashcatObject * self, PyObject * noargs)
 {
 
-  char *rtn;
+    char *rtn;
 
-  rtn = status_get_guess_charset (self->hashcat_ctx);
-  return Py_BuildValue ("s", rtn);
+    rtn = status_get_guess_charset (self->hashcat_ctx);
+    return Py_BuildValue ("s", rtn);
 }
 
 PyDoc_STRVAR(status_get_guess_mask_length__doc__,
-"status_get_guess_mask_length -> int\n\n\
+             "status_get_guess_mask_length -> int\n\n\
 Return length of input mask.\n\n");
 
 static PyObject *hashcat_status_get_guess_mask_length (hashcatObject * self, PyObject * noargs)
 {
 
-  int rtn;
+    int rtn;
 
-  rtn = status_get_guess_mask_length (self->hashcat_ctx);
-  return Py_BuildValue ("i", rtn);
+    rtn = status_get_guess_mask_length (self->hashcat_ctx);
+    return Py_BuildValue ("i", rtn);
 }
+
 
 PyDoc_STRVAR(status_get_guess_candidates_dev__doc__,
 "status_get_guess_candidates_dev(device_id) -> str\n\n\
@@ -1651,10 +1650,10 @@ Return cracked per time (day).\n\n");
 static PyObject *hashcat_status_get_cpt_cur_day (hashcatObject * self, PyObject * noargs)
 {
 
-  int rtn;
+    int rtn;
 
-  rtn = status_get_cpt_cur_day (self->hashcat_ctx);
-  return Py_BuildValue ("i", rtn);
+    rtn = status_get_cpt_cur_day (self->hashcat_ctx);
+    return Py_BuildValue ("i", rtn);
 }
 
 PyDoc_STRVAR(status_get_cpt_avg_min__doc__,
@@ -1817,6 +1816,16 @@ static PyObject *hashcat_status_get_runtime_msec_dev (hashcatObject * self, PyOb
   return Py_BuildValue ("d", rtn);
 
 }
+
+/* todo maybe implement, since benchmark.py wants it
+PyDoc_STRVAR(status_get_hash_type__doc__, "status_get_hash_type(ctx\n\nReturn Hash type,\n\n)");
+static PyObject *hashcat_status_get_hash_type(hashcatObject *self, PyObject *args)
+{
+    char rtn;
+    rtn = status_get_hash_type(self->hashcat_ctx);
+    return Py_BuildValue("s", rtn);
+}
+ */
 
 
 PyDoc_STRVAR(hash__doc__,
@@ -3623,13 +3632,13 @@ PyDoc_STRVAR(opencl_devices__doc__,
 static PyObject *hashcat_getopencl_devices (hashcatObject * self)
 {
 
-  if (self->user_options->opencl_devices == NULL)
+  if (self->user_options->backend_devices == NULL)
   {
     Py_INCREF (Py_None);
     return Py_None;
   }
 
-  return Py_BuildValue ("s", self->user_options->opencl_devices);
+  return Py_BuildValue ("s", self->user_options->backend_devices);
 
 }
 
@@ -3652,7 +3661,7 @@ static int hashcat_setopencl_devices (hashcatObject * self, PyObject * value, vo
   }
 
   Py_INCREF (value);
-  self->user_options->opencl_devices = PyUnicode_AsUTF8 (value);
+  self->user_options->backend_devices = PyUnicode_AsUTF8 (value);
 
   return 0;
 
@@ -3665,7 +3674,7 @@ PyDoc_STRVAR(opencl_info__doc__,
 static PyObject *hashcat_getopencl_info (hashcatObject * self)
 {
 
-  return PyBool_FromLong (self->user_options->opencl_info);
+  return PyBool_FromLong (self->user_options->backend_info);
 
 }
 
@@ -3691,14 +3700,14 @@ static int hashcat_setopencl_info (hashcatObject * self, PyObject * value, void 
   {
 
     Py_INCREF (value);
-    self->user_options->opencl_info = 1;
+    self->user_options->backend_info = 1;
 
   }
   else
   {
 
     Py_INCREF (value);
-    self->user_options->opencl_info = 0;
+    self->user_options->backend_info = 0;
 
   }
 
@@ -3715,38 +3724,13 @@ PyDoc_STRVAR(opencl_platforms__doc__,
 static PyObject *hashcat_getopencl_platforms (hashcatObject * self)
 {
 
-  if (self->user_options->opencl_platforms == NULL)
+  if (self->hashcat_ctx->backend_ctx->opencl_platforms == NULL)
   {
     Py_INCREF (Py_None);
     return Py_None;
   }
 
-  return Py_BuildValue ("s", self->user_options->opencl_platforms);
-
-}
-
-// setter - opencl_platforms
-static int hashcat_setopencl_platforms (hashcatObject * self, PyObject * value, void *closure)
-{
-
-  if (value == NULL)
-  {
-
-    PyErr_SetString (PyExc_TypeError, "Cannot delete opencl_platforms attribute");
-    return -1;
-  }
-
-  if (!PyUnicode_Check (value))
-  {
-
-    PyErr_SetString (PyExc_TypeError, "The opencl_platforms attribute value must be a string");
-    return -1;
-  }
-
-  Py_INCREF (value);
-  self->user_options->opencl_platforms = PyUnicode_AsUTF8 (value);
-
-  return 0;
+  return Py_BuildValue ("s", self->hashcat_ctx->backend_ctx->opencl_platforms);
 
 }
 
@@ -3757,7 +3741,7 @@ PyDoc_STRVAR(opencl_vector_width__doc__,
 static PyObject *hashcat_getopencl_vector_width (hashcatObject * self)
 {
 
-  return Py_BuildValue ("i", self->user_options->opencl_vector_width);
+  return Py_BuildValue ("i", self->user_options->backend_vector_width);
 
 }
 
@@ -3780,7 +3764,7 @@ static int hashcat_setopencl_vector_width (hashcatObject * self, PyObject * valu
   }
 
   Py_INCREF (value);
-  self->user_options->opencl_vector_width = PyLong_AsLong (value);
+  self->user_options->backend_vector_width = PyLong_AsLong (value);
 
   return 0;
 
@@ -5709,7 +5693,6 @@ static int hashcat_setworkload_profile (hashcatObject * self, PyObject * value, 
 }
 
 
-
 /* method array */
 
 static PyMethodDef hashcat_methods[] = {
@@ -5790,6 +5773,7 @@ static PyMethodDef hashcat_methods[] = {
   {"status_get_memoryspeed_dev", (PyCFunction) hashcat_status_get_memoryspeed_dev, METH_VARARGS, status_get_memoryspeed_dev__doc__},
   {"status_get_progress_dev", (PyCFunction) hashcat_status_get_progress_dev, METH_VARARGS, status_get_progress_dev__doc__},
   {"status_get_runtime_msec_dev", (PyCFunction) hashcat_status_get_runtime_msec_dev, METH_VARARGS, status_get_runtime_msec_dev__doc__},
+  //{"status_get_hash_type", (PyCFunction) hashcat_status_get_hash_type, METH_VARARGS, status_get_hash_type__doc__},
   {NULL, NULL, 0, NULL}
 };
 
@@ -5839,7 +5823,6 @@ static PyGetSetDef hashcat_getseters[] = {
   {"opencl_device_types", (getter) hashcat_getopencl_device_types, (setter) hashcat_setopencl_device_types, opencl_device_types__doc__, NULL},
   {"opencl_devices", (getter) hashcat_getopencl_devices, (setter) hashcat_setopencl_devices, opencl_devices__doc__, NULL},
   {"opencl_info", (getter) hashcat_getopencl_info, (setter) hashcat_setopencl_info, opencl_info__doc__, NULL},
-  {"opencl_platforms", (getter) hashcat_getopencl_platforms, (setter) hashcat_setopencl_platforms, opencl_platforms__doc__, NULL},
   {"opencl_vector_width", (getter) hashcat_getopencl_vector_width, (setter) hashcat_setopencl_vector_width, opencl_vector_width__doc__, NULL},
   {"optimized_kernel_enable", (getter) hashcat_getoptimized_kernel_enable, (setter) hashcat_setoptimized_kernel_enable, optimized_kernel_enable__doc__, NULL},
   {"outfile", (getter) hashcat_getoutfile, (setter) hashcat_setoutfile, outfile__doc__, NULL},
