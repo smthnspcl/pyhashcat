@@ -5,6 +5,7 @@ sudo apt install -y git build-essential python3 python3-dev > /dev/null 2>&1
 if [ ! -d "hashcat" ]; then
   echo "initializing and updating submodules"
   git submodule update --init > /dev/null 2>&1
+  sed -i "1s/^/#include <deps\/zlib\/zconf.h>\n/" hashcat/deps/zlib/contrib/minizip/crypt.h
 else
   echo "hashcat directory exists; not pulling"
 fi

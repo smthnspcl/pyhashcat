@@ -1,48 +1,43 @@
-# pyhashcat
+## pyhashcat
 
-## notes
-upon checking out hashcat; you will probably need to edit hashcat/deps/zlib/contrib/minizip/crypt.h<br>
-append "#include <deps/zlib/zconf.h>" to the top of the file<br>
-to test if the build would work just "mkdir build; cmake ..; make"
+Python C API binding to libhashcat, originally written by Rich5. <br>
+Updated to use the latest Hashcat version, with additional functionality added. 
 
-Python bindings for hashcat
-------
-Python C API binding to libhashcat, originally written by Rich5. Updated to use the latest Hashcat version, with additional functionality added. 
+Pulled from [here](https://github.com/Rich5/pyhashcat/tree/master/pyhashcat)<br>
+and ported to Python v3 [here](https://github.com/initiate6/pyhashcat/tree/master/pyhashcat)
 
-
-Pulled from here: https://github.com/Rich5/pyhashcat/tree/master/pyhashcat<br>
-and ported to Python v3 here: https://github.com/initiate6/pyhashcat/tree/master/pyhashcat
-
-pyhashcat has been completely rewritten as a Python C extension to interface directly with libhashcat. The pyhashcat module now acts as direct bindings to hashcat.
-
-VERSION: 5.1
-
+pyhashcat has been completely rewritten as a Python C extension to interface directly with libhashcat. <br>
+The pyhashcat module now acts as direct bindings to hashcat.
 
 Requirements: 
-* libhashcat 5.1.0
-* Python 3.6/7
+* libhashcat
+* Python 3
 
-### Install libhashcat and pyhashcat:
-
+#### how to...
+##### install:
 ```
 ./setup.sh
 ```
 
-### Simple Test:
-
+##### test:
 ```
-user@host:~/pyHashcat/pyhashcat$ python3 tests/simple_mask.py
+$ python3 tests/simple_mask.py
 -------------------------------
 ---- Simple pyhashcat Test ----
 -------------------------------
 [+] Running hashcat
+... snip
 STATUS:  Cracked
 8743b52063cd84097a65d1633f5c74f5  -->  hashcat
 ```
 
-### Help:
+#### help:
 
 ```
+CLion / PyCharm will give good autocompletion, even for the Hashcat object
+
+else: 
+
 import pyhashcat
 help(pyhashcat)
 
