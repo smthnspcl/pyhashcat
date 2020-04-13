@@ -1,6 +1,7 @@
 #!/usr/bin/bash
 
-sudo apt install -y git build-essential python3 python3-dev > /dev/null 2>&1
+echo "installing dependencies"
+sudo apt install -y git build-essential python3 python3-dev # > /dev/null 2>&1
 
 if [ ! -d "hashcat" ]; then
   echo "initializing and updating submodules"
